@@ -127,4 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# remove from git repo
 ./DS_Store
+./Images
+./ipynb_checkpoints
