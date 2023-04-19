@@ -222,14 +222,48 @@ div.csl-indent {
 <h2 data-number="4.3" class="anchored" data-anchor-id="model-selection"><span class="header-section-number">4.3</span> Model Selection</h2>
 <section id="object-detection-and-classification-methods" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="object-detection-and-classification-methods"><span class="header-section-number">4.3.1</span> Object Detection and Classification Methods</h3>
-<p>Several models were evaluated for the tasks of face detection and mask classification. The first model tested was developed by a previous student who worked on this project. This model was trained on a new dataset consisting of real-world images collected from image search sites. The goal of this model was to predict mask-wearing behaviour. This model was not fine-tuned on the images collected from the trails, so it essentially acted as a pure off-the-shelf model. This model showed promising results on training and validation, and in this project was tested on a new real-world trail image dataset. The performance of this model on the real-world dataset is discussed in the results (see <a href="#sec-results">Section&nbsp;5</a>).</p>
-<p>Additional off-the-shelf models were tested in the interest of evaluating the feasibility of these off-the-shelf models for real-world applications and industries that may not have access to machine learning expertice.</p>
+<p>Several models were evaluated for the tasks of face detection and mask classification. The first model tested was developed by a previous student who worked on this project. This model, called Xception, was trained on a new dataset consisting of real-world images collected from image search sites. The goal of this model was to predict mask-wearing behaviour. However, this model was not fine-tuned on the images collected from the trails, so it essentially acted as a pure off-the-shelf model. This model showed promising results on training and validation, and in this project was tested on a new real-world trail image dataset. The performance of this model on the real-world dataset is discussed in the results (see <a href="#sec-results">Section&nbsp;5</a>).</p>
+<p>An additional off-the-shelf model was tested in the interest of evaluating the feasibility of for real-world applications and industries that may not have access to machine learning expertice, such as parks and forestry.</p>
+<section id="previous-mask-classifier-architecture" class="level4" data-number="4.3.1.1">
+<h4 data-number="4.3.1.1" class="anchored" data-anchor-id="previous-mask-classifier-architecture"><span class="header-section-number">4.3.1.1</span> Previous Mask-Classifier Architecture</h4>
+<p>The mask classifier designed by a previous student worked as follows:</p>
+<ol type="1">
+<li>Apply RetinaNet face detection model to generate face crops</li>
+<li>Feed cropped face to Xception model for mask classification</li>
+<li>Final output is the face detected by RetinaFace along with the mask prediction</li>
+</ol>
+<p>This architecture uses a pre-trained face detection model called RetinaNet, which was chosen due to it’s supperior performance against other algorithms such as MT-CNN, Haar Cascade and HOG. RetinaNet achieves higher recall and precision than the aformentioned algorithms.</p>
+<p>The Xception model is used in this architecture for the mask classification portion. Transfer learning was employed to use the exising model weights of the Xception model, and additional learning was completed in an iterative manner to finetune against the newly gathered training set.</p>
+<p>This classifier was evaluated based on F1-score and the Loss. It was demonstrated to achieve an F1-score of 0.99, and a loss of 0.0182.</p>
+</section>
+<section id="new-mask-classifier-architecture" class="level4" data-number="4.3.1.2">
+<h4 data-number="4.3.1.2" class="anchored" data-anchor-id="new-mask-classifier-architecture"><span class="header-section-number">4.3.1.2</span> New Mask-Classifier Architecture</h4>
+<p>A new architecture was tested on the trails image set. This architecture was chosen from several pre-trained options, and was evaluated against the dataset and the previous Xception model. This architecture is a pure off-the-shelf solution, and was shown to have promise when confronted with unseen real-world data. The model tested is a FaceMaskDetection model developed by a group called AIZOOtech. This model was trained on 7971 images composed of WIDER FACE and MAFA. WIDER FACE is a face detection benchmark dataset that contains images from the publicaly available WIDER dataset. This dataset containes images with a high degree of variability in scale, pose, and occlusion. This variablity can help deter the model from overfitting during training. AIZOO provides API access to their model via PyTorch, TensorFlow, Keras, MXNet, Caffee, Paddle, and OpenCV dnn. The PyTorch framework was used for this analysis.</p>
+<p>The model structure can be seen in <a href="#fig-aizoo-model">Figure&nbsp;4</a>.</p>
+<div id="fig-aizoo-model" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/models/AIZOOModel.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: AIZOO Model Structure</figcaption><p></p>
+</figure>
+</div>
+</section>
 </section>
 <section id="metric-evaluation" class="level3" data-number="4.3.2">
 <h3 data-number="4.3.2" class="anchored" data-anchor-id="metric-evaluation"><span class="header-section-number">4.3.2</span> Metric Evaluation</h3>
-<p>Standard metrics were used to evaluate the models introduced above. The metrics chosen were sensitivity, specificity, precision, and accuracy. Sensitvity and specificity are not commonly found when it comes to evaluating deep learning models, but are common to the field of biostatistics, which is relevant to this project. Precision and recall were chosen since they are very common metrics used across the fields of computer science and machine learning. All four metrics were assessed across models and sub-groups, but the focal point will be sensitivity and specificity.</p>
+<p>Standard metrics were used to evaluate the models introduced above. The metrics chosen were sensitivity, specificity, precision, and accuracy. Sensitvity and specificity are not commonly found when it comes to evaluating deep learning models, but are common to the field of biostatistics, which is relevant to this project. Precision and recall were chosen since they are very common metrics used across the fields of computer science and machine learning. All four metrics were assessed across models and sub-groups, but the focal point was sensitivity and specificity.</p>
 <p>Sensitivity is defined as the probability of having a true positive given that you tested positive: <span class="math inline">\(P(T=1 | D=1)\)</span>, where T is the true result, and D is the test result.</p>
 <p>Specificity is defined as the probability of having a true negative given that you tested negative: <span class="math inline">\(P(T=0 | D=0)\)</span>, where T is the true result, and D is the test result.</p>
+</section>
+<section id="additional-models-tested" class="level3" data-number="4.3.3">
+<h3 data-number="4.3.3" class="anchored" data-anchor-id="additional-models-tested"><span class="header-section-number">4.3.3</span> Additional Models Tested</h3>
+<section id="deepface" class="level4" data-number="4.3.3.1">
+<h4 data-number="4.3.3.1" class="anchored" data-anchor-id="deepface"><span class="header-section-number">4.3.3.1</span> DeepFace</h4>
+<p>DeepFace is an off-the-shelf facial recognition framework for python. The library includes access to state-of-the-art models such as VGG-Face, Google FaceNet, OpenFace, Facebook DeepFace, DeepID, ArcFace, Dlib and SFace. The performance of DeepFace is discussed in <a href="#sec-deepface-results">Section&nbsp;5.2</a>.</p>
+</section>
+<section id="retinaface" class="level4" data-number="4.3.3.2">
+<h4 data-number="4.3.3.2" class="anchored" data-anchor-id="retinaface"><span class="header-section-number">4.3.3.2</span> RetinaFace</h4>
+<p>The performance of RetinaFace is discussed in <a href="#sec-retinaface-results">Section&nbsp;5.3</a>.</p>
+</section>
 </section>
 </section>
 </section>
@@ -240,9 +274,9 @@ div.csl-indent {
 <li>Graphs and tables</li>
 <li>Discussion of the challenges and limitations of the approach, such as privacy concerns and data quality</li>
 </ul>
-<section id="helena-nn" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="helena-nn"><span class="header-section-number">5.1</span> Helena NN</h2>
-<p>The model provided by the research group was evaluated against the metrics defined above. The results can be seen in <a href="#tbl-metrics-full-dataset">Table&nbsp;1</a>. Plots can be seen in <a href="#fig-all-groups">Figure&nbsp;4 (a)</a>.</p>
+<section id="xception-model" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="xception-model"><span class="header-section-number">5.1</span> Xception Model</h2>
+<p>The model provided by the research group was evaluated against the metrics defined above. The results can be seen in <a href="#tbl-metrics-full-dataset">Table&nbsp;1</a> and plots can be found in <a href="#fig-all-groups">Figure&nbsp;5 (a)</a>.</p>
 <div id="fig-metrics_full_dataset" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -294,14 +328,39 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;4: Deep Neural Network Metrics</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;5: Deep Neural Network Metrics</figcaption><p></p>
 </figure>
 </div>
+<p>The lower bound and upper bounds of the metrics were calculated by bootstrapping a 95% confidence interval. Bootstrap methods, in general, consist of estimating a characteristic of the unknown population by simulating the characteristic when the true population is replaced by an esitmated one <span class="citation" data-cites="diciccio1988review">(see <a href="#ref-diciccio1988review" role="doc-biblioref">Diciccio and Romano 1988</a>)</span>. The 95th percentile method was used to calculate a set of approximate confidence limits for the metrics defined above.</p>
+<p>The metric results for the full dataset provided some insights on the limitations of the trained model. A noteworthy limitation is the specificity equal to 0.4 and the sensitificy equal to 0.8. The relatively high sensitivity paired with a low specificity shows that this model overpredics mask wearing. Additional sub-groups were analyzed to see if the model performed better in different scenarios.</p>
 <section id="sub-group-metric-evaluations" class="level3" data-number="5.1.1">
 <h3 data-number="5.1.1" class="anchored" data-anchor-id="sub-group-metric-evaluations"><span class="header-section-number">5.1.1</span> Sub-group Metric Evaluations</h3>
-<section id="image-examples" class="level4" data-number="5.1.1.1">
-<h4 data-number="5.1.1.1" class="anchored" data-anchor-id="image-examples"><span class="header-section-number">5.1.1.1</span> Image Examples</h4>
-<p>Quadrant 1 image examples can be seen in <a href="#fig-q1">Figure&nbsp;5</a></p>
+<p>See <a href="#fig-quadrants">Figure&nbsp;6</a> for metrics calculated across frame quadrants. The first and third quadrants represent the upper-left and upper-right quadrants of each frame, respectively. Quadrants 2 and 4 represent the bottom two quadrants of each frame, and in most cases are images of the ground. In this analysis, all faces were found in quadrants 1 and 3. Both quadrant 1 and quadrant 3 have poor specificity, with quadrant 3 having very poor specificity compared to the entire dataset. Both of these quadrants have high sensitivity also, which indicates overprediction independant of quadrant.</p>
+<div id="fig-quadrants" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/metrics/quadrants_metrics.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;6: Metrics Across Quadrants</figcaption><p></p>
+</figure>
+</div>
+<p>See <a href="#fig-dates">Figure&nbsp;7</a> for metrics calculated across dates. In terms of specificity, all dates have poor specificity, and high sensitivity, indicating overprediction independant of date.</p>
+<div id="fig-dates" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/metrics/dates_metrics.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;7: Metrics Across Dates</figcaption><p></p>
+</figure>
+</div>
+<p>See <a href="#fig-quadrants-dates">Figure&nbsp;8</a> for metrics across a combination of quadrants and dates. The hypothesis is that since both the quadrants and dates yielded similar results, the combination will yield overpredicion as well.</p>
+<div id="fig-quadrants-dates" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/metrics/quadrants_dates_metrics.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;8: Metrics Across Quadrants and Dates</figcaption><p></p>
+</figure>
+</div>
+<p>As can be seen in <a href="#fig-quadrants-dates">Figure&nbsp;8</a>, each sub-group has high sensitivity and low specificity, which aligns with the overprediction hypothesis.</p>
+</section>
+<section id="image-examples" class="level3" data-number="5.1.2">
+<h3 data-number="5.1.2" class="anchored" data-anchor-id="image-examples"><span class="header-section-number">5.1.2</span> Image Examples</h3>
+<p>Quadrant 1 image examples can be seen in <a href="#fig-q1">Figure&nbsp;9</a></p>
 <div id="fig-q1" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -312,10 +371,10 @@ div.csl-indent {
 <p><img src="final_report_images/examples/q1/q1_2.png" class="img-fluid figure-img"></p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;5: Quadrant 1 Examples</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;9: Quadrant 1 Examples</figcaption><p></p>
 </figure>
 </div>
-<p>Quadrant 3 image examples can be seen in <a href="#fig-q3">Figure&nbsp;6</a></p>
+<p>Quadrant 3 image examples can be seen in <a href="#fig-q3">Figure&nbsp;10</a></p>
 <div id="fig-q3" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -326,50 +385,162 @@ div.csl-indent {
 <p><img src="final_report_images/examples/q3/q3_2.png" class="img-fluid figure-img"></p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;6: Quadrant 3 Examples</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;10: Quadrant 3 Examples</figcaption><p></p>
 </figure>
 </div>
 </section>
-<section id="sub-group-metrics" class="level4" data-number="5.1.1.2">
-<h4 data-number="5.1.1.2" class="anchored" data-anchor-id="sub-group-metrics"><span class="header-section-number">5.1.1.2</span> Sub-group Metrics</h4>
-<p>See <a href="#fig-quadrants">Figure&nbsp;7</a> for metrics calculated across frame quadrants. The first and third quadrants represent the upper-left and upper-right quadrants of each frame, respectively. Quadrants 2 and 4 represent the bottom two quadrants of each frame, and in most cases are images of the ground. In this analysis, all faces were found in quadrants 1 and 3. Both quadrant 1 and quadrant 3 have poor specificity, with quadrant 3 having very poor specificity compared to the entire dataset. Both of these quadrants have high sensitivity also, which indicates overprediction independant of quadrant.</p>
-<div id="fig-quadrants" class="quarto-figure quarto-figure-center anchored">
+</section>
+<section id="sec-deepface-results" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="sec-deepface-results"><span class="header-section-number">5.2</span> DeepFace</h2>
+<p>The results of the face detectors are shown in <a href="#fig-deepface">Figure&nbsp;11</a>. The Xception architecture was able to find and draw a bounding box on one of two visible faces in the image. The DeepFace model, using the retinaface backend, succesfully found both visible faces.</p>
+<div id="fig-deepface" class="quarto-layout-panel">
 <figure class="figure">
-<p><img src="final_report_images/metrics/quadrants_metrics.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;7: Metrics Across Quadrants</figcaption><p></p>
-</figure>
-</div>
-<p>See <a href="#fig-dates">Figure&nbsp;8</a> for metrics calculated across dates. In terms of specificity, all dates have poor specificity, and high sensitivity, indicating overprediction independant of date.</p>
-<div id="fig-dates" class="quarto-figure quarto-figure-center anchored">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-deepface-og" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="final_report_images/metrics/dates_metrics.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;8: Metrics Across Dates</figcaption><p></p>
+<p><img src="final_report_images/deepface/og.png" class="img-fluid figure-img" data-ref-parent="fig-deepface"></p>
+<p></p><figcaption class="figure-caption">(a) Original Image</figcaption><p></p>
 </figure>
 </div>
-<p>See <a href="#fig-quadrants-dates">Figure&nbsp;9</a> for metrics across a combination of quadrants and dates. The hypothesis is that since both the quadrants and dates yielded similar results, the combination will yield overpredicion as well.</p>
-<div id="fig-quadrants-dates" class="quarto-figure quarto-figure-center anchored">
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-deepface-xception" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="final_report_images/metrics/quadrants_dates_metrics.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;9: Metrics Across Quadrants and Dates</figcaption><p></p>
+<p><img src="final_report_images/deepface/xception.png" class="img-fluid figure-img" data-ref-parent="fig-deepface"></p>
+<p></p><figcaption class="figure-caption">(b) Xception</figcaption><p></p>
 </figure>
 </div>
-<p>As can be seen in <a href="#fig-quadrants-dates">Figure&nbsp;9</a>, each sub-group has high sensitivity and low specificity, which aligns with the overprediction hypothesis.</p>
-<p>The lower bound and upper bounds of the metrics were calculated by bootstrapping a 95% confidence interval. Bootstrap methods, in general, consist of estimating a characteristic of the unknown population by simulating the characteristic when the true population is replaced by an esitmated one <span class="citation" data-cites="diciccio1988review">(see <a href="#ref-diciccio1988review" role="doc-biblioref">Diciccio and Romano 1988</a>)</span>. The 95th percentile method was used to calculate a set of approximate confidence limits for the metrics defined above.</p>
-<p>The metric results for the full dataset provided some insights on the limitations of the trained model. A noteworthy limitation is the specificity equal to 0.4 and the sensitificy equal to 0.8. The relatively high sensitivity paired with a low specificity shows that this model overpredics mask wearing. Additional sub-groups were analyzed to see if the model performed better in different scenarios.</p>
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 33.3%;justify-content: center;">
+<div id="fig-deepface-deepface" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/deepface/deepface.png" class="img-fluid figure-img" data-ref-parent="fig-deepface"></p>
+<p></p><figcaption class="figure-caption">(c) DeepFace</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;11: Facial Detection</figcaption><p></p>
+</figure>
+</div>
 </section>
+<section id="sec-retinaface-results" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="sec-retinaface-results"><span class="header-section-number">5.3</span> RetinaFace</h2>
+<p>The retinaface backend proved successful when testing the DeepFace framework. Retinaface also provides the capability to extract facial landmarks, such as the eyes, nose, and mouth corners. One hypothesis was to use the facial landmarks, or lack-there-of, to infer whether or not a mask is being worn. However, as can be see in <a href="#fig-retina-mask2">Figure&nbsp;12 (d)</a>, the RetinaFace algorithm attempted to find facial landmark points regardless of mask-wearing.</p>
+<div id="fig-retinaface" class="quarto-layout-panel">
+<figure class="figure">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-retina1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/retinaface/retinaface_1.png" class="img-fluid figure-img" data-ref-parent="fig-retinaface"></p>
+<p></p><figcaption class="figure-caption">(a) Facial Landmark Extraction</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-retina2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/retinaface/retinaface_2.png" class="img-fluid figure-img" data-ref-parent="fig-retinaface"></p>
+<p></p><figcaption class="figure-caption">(b) Facial Landmark Extraction</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-retina-mask1" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/retinaface/retinaface_mask_1.png" class="img-fluid figure-img" data-ref-parent="fig-retinaface"></p>
+<p></p><figcaption class="figure-caption">(c) Original Image</figcaption><p></p>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-retina-mask2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/retinaface/retinaface_mask_2.png" class="img-fluid figure-img" data-ref-parent="fig-retinaface"></p>
+<p></p><figcaption class="figure-caption">(d) Facial Landmark Extraction</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;12: Facial Landmark Detection</figcaption><p></p>
+</figure>
+</div>
 </section>
+<section id="aizoo-model" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="aizoo-model"><span class="header-section-number">5.4</span> AIZOO Model</h2>
+<div id="fig-aizoo" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/aizoo/aizoo.png" class="img-fluid figure-img" style="width:75.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;13: AIZOO Inference</figcaption><p></p>
+</figure>
+</div>
+<div id="fig-aizoo-metrics" class="quarto-layout-panel">
+<figure class="figure">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-aizoo-metrics" class="quarto-layout-cell anchored" style="flex-basis: 50.0%;justify-content: center;">
+<table class="table">
+<caption>Table&nbsp;2: Metrics - AIZOO</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Metric</th>
+<th style="text-align: center;">Score</th>
+<th style="text-align: center;">Lower bound</th>
+<th style="text-align: center;">Upper bound</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Sensitivity</td>
+<td style="text-align: center;">0.5199</td>
+<td style="text-align: center;">0.4778</td>
+<td style="text-align: center;">0.5740</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Specificity</td>
+<td style="text-align: center;">0.9804</td>
+<td style="text-align: center;">0.9642</td>
+<td style="text-align: center;">0.9932</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Precision</td>
+<td style="text-align: center;">0.9676</td>
+<td style="text-align: center;">0.9326</td>
+<td style="text-align: center;">0.9864</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Accuracy</td>
+<td style="text-align: center;">0.7386</td>
+<td style="text-align: center;">0.7118</td>
+<td style="text-align: center;">0.7698</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-aizoo" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/aizoo/aizoo_metrics.png" class="img-fluid figure-img" data-ref-parent="fig-aizoo-metrics"></p>
+<p></p><figcaption class="figure-caption">(a) AIZOO Inference</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;14: AIZOO Metrics</figcaption><p></p>
+</figure>
+</div>
 </section>
-<section id="deepface" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="deepface"><span class="header-section-number">5.2</span> DeepFace</h2>
-</section>
-<section id="retinaface" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="retinaface"><span class="header-section-number">5.3</span> RetinaFace</h2>
-</section>
-<section id="off-the-shelf-mask-inference-model" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="off-the-shelf-mask-inference-model"><span class="header-section-number">5.4</span> Off-the-shelf Mask Inference Model</h2>
-</section>
-<section id="original-nn-vs-off-the-shelf-mask-inference-model" class="level2" data-number="5.5">
-<h2 data-number="5.5" class="anchored" data-anchor-id="original-nn-vs-off-the-shelf-mask-inference-model"><span class="header-section-number">5.5</span> Original NN vs Off-the-shelf Mask Inference Model</h2>
+<section id="xception-vs-aizoo" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="xception-vs-aizoo"><span class="header-section-number">5.5</span> Xception vs AIZOO</h2>
+<div id="fig-aizoo-xception" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/aizoo/aizoo_vs_xception.png" class="img-fluid figure-img" style="width:70.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;15: AIZOO Inference</figcaption><p></p>
+</figure>
+</div>
 </section>
 </section>
 <section id="conclusion---todo" class="level1" data-number="6">
