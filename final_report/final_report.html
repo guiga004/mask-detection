@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Mohammed Guiga">
+<meta name="author" content="Mohammed Guiga, M.S. Data Science">
 
 <title>Deep Learning Models for Measuring Mask-Wearing Behavior in Public Spaces</title>
 <style>
@@ -54,8 +54,6 @@ div.csl-indent {
 <link href="final_report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="final_report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -78,7 +76,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Mohammed Guiga </p>
+             <p>Mohammed Guiga, M.S. Data Science </p>
           </div>
   </div>
     
@@ -89,6 +87,13 @@ div.csl-indent {
 
 </header>
 
+<div style="page-break-after: always;"></div>
+<section id="acknowledgements" class="level1">
+<h1>Acknowledgements</h1>
+<p>I would like to acknowledge and express my gratitude to my capstone advisor, Dr.&nbsp;Julian Wolfson, for his guidance and patience throughout the entirety of this project. His expertise and insight were invaluable in shaping the direction of this research.</p>
+<p>I would also like to give a special thanks to my wife, Aminah Qandeel, for her unwavering support throughout the last two years. I couldn’t have accomplished this without her!</p>
+<div style="page-break-after: always;"></div>
+</section>
 <section id="sec-abstract" class="level1">
 <h1>Abstract</h1>
 <p>This project explores the feasibility of off-the-shelf deep learning models on a novel trail dataset. This dataset was curated by installing cameras at multiple locations adjacent to trails at several lakes in Minneapolis. The results of this project show the successful usage of off-the-shelf models for face detection, mask detection, and people tracking.</p>
@@ -96,7 +101,7 @@ div.csl-indent {
 <section id="sec-introduction" class="level1">
 <h1>Introduction</h1>
 <p>Advances in deep learning have brought the technology to a point of maturity where many pre-trained models now exist for common tasks, such as object detection. As a result, smaller companies and industries that may have previously lacked the resources to invest in a machine learning department now can leverage this technology for their benefit. To explore this further, this project examines the performance of multiple off-the-shelf models on a novel dataset.</p>
-<p>Throughout this paper, the novel dataset explored in this project will be referred to as the “novel trail dataset.” This dataset was curated by installing ZED cameras at multiple locations adjacent to trails at several lakes in Minneapolis. These lakes encompass Lake of the Isles, Bde Maka Ska, and Lake Harriet. In total, 31 hours of footage in favorable weather was recorded, and 3 minutes of that footage was manually labeled to assess the performance of a mask detector.</p>
+<p>Throughout this paper, the novel dataset explored in this project will be referred to as the “novel trail dataset.” This dataset was curated by installing ZED cameras at multiple locations adjacent to trails at several lakes in Minneapolis. These lakes encompass Lake of the Isles, Bde Maka Ska, and Lake Harriet. In total, 31 hours of footage in favorable weather was recorded, and 3 minutes, or 837 frames, of that footage was manually labeled to assess the performance of a mask detector.</p>
 <p>Four off-the-shelf deep learning models were tested on this dataset. One model for face detection, two for mask detection, and one for people tracking. The two mask detection models were able to be compared against each other since ground truth values were available for a subset of the data; sensitivity, specificity, precision, and accuracy were used as metrics to assess model performance. The other two models, face detection and people tracking were assessed qualitatively.</p>
 <p>The results of this work demonstrate the successful usage of off-the-shelf deep learning models for face detection, mask detection, and people tracking in a never-before-seen park setting.</p>
 </section>
@@ -108,8 +113,267 @@ div.csl-indent {
 </section>
 <section id="data-collection" class="level2">
 <h2 class="anchored" data-anchor-id="data-collection">Data Collection</h2>
-<p>ZED cameras were installed at multiple locations adjacent to trails at Lake of the Isles, Bde Maka Ska, and Lake Harriet. These locations were selected to be near amenities such as beaches, food/entertainment, and parks. MPRB permits were issued through the summer of 2021, and 31 hours of footage in favorable weather conditions were recorded.</p>
-<p>The location of data collection sites are shown in <a href="#fig-lakes">Figure&nbsp;1</a>, examples of these sites are shown in <a href="#fig-trails">Figure&nbsp;2</a>, and the camera installation locations are shown in <a href="#fig-cameras">Figure&nbsp;3</a>.</p>
+<p>ZED cameras were installed at multiple locations adjacent to trails at Lake of the Isles, Bde Maka Ska, and Lake Harriet. These locations were selected to be near amenities such as beaches, food/entertainment, and parks. MPRB permits were issued through the summer of 2021, and 31 hours of footage in favorable weather conditions were recorded. This footage was recorded on May 26, June 14, and June 18, 2021.</p>
+<p>The location of data collection sites are shown in <a href="#fig-lakes">Figure&nbsp;4</a>, examples of these sites are shown in <a href="#fig-trails">Figure&nbsp;5</a>, and the camera installation locations are shown in <a href="#fig-cameras">Figure&nbsp;6</a>.</p>
+<p>In order to assess the performance of a mask classifier, a subset of footage needs to be labeled. Having access to the ground-truth values allows classifier metrics to be calculated as well as opening up the possibility of fine-tuning. Manual labeling was employed to achieve ground-truth labeling, and faces in 977 frames were labeled with their corresponding mask-wearing status. Of these 977 frames, 530 held the label “No Mask”, and 447 “Mask.” Because the rate of mask-wearing by trail users was low, research staff conducted walk-bys while wearing masks to increase the amount of mask-wearing footage.</p>
+</section>
+<section id="machine-learning" class="level2">
+<h2 class="anchored" data-anchor-id="machine-learning">Machine Learning</h2>
+<section id="face-detection" class="level3">
+<h3 class="anchored" data-anchor-id="face-detection">Face Detection</h3>
+<p>Determining whether a person is wearing a face mask is dependent on being able to detect their face. Two mask detectors are evaluated in this work, and both utilize face detectors that are similar to a model called RetinaFace. The sections below briefly introduce facial detection frameworks explored in this project.</p>
+<section id="deepface-and-retinaface" class="level4">
+<h4 class="anchored" data-anchor-id="deepface-and-retinaface">DeepFace and RetinaFace</h4>
+<p>DeepFace is an off-the-shelf facial recognition framework for python. This library includes access to state-of-the-art models such as VGG-Face, Google FaceNet, OpenFace, Facebook DeepFace, DeepID, ArcFace, Dlib, and SFace. RetinaFace is an off-the-shelf face detection package that utilizes a Resnet50 backbone. Resnet50 is a convolutional neural network-based model that consists of 48 convolution layers <span class="citation" data-cites="mascarenhas2021comparison">(<a href="#ref-mascarenhas2021comparison" role="doc-biblioref">Mascarenhas and Agarwal 2021</a>)</span>. Furthermore, the ResNet architecture allowed deep neural networks to mitigate greater training error percentages by introducing the addition of shortcut connections and residual functions <span class="citation" data-cites="mascarenhas2021comparison">(<a href="#ref-mascarenhas2021comparison" role="doc-biblioref">Mascarenhas and Agarwal 2021</a>)</span>.</p>
+</section>
+</section>
+<section id="mask-detection" class="level3">
+<h3 class="anchored" data-anchor-id="mask-detection">Mask Detection</h3>
+<section id="xception" class="level4">
+<h4 class="anchored" data-anchor-id="xception">Xception</h4>
+<p>Xception is convolutional neural network architecture based entirely on depthwise separable convolution layers <span class="citation" data-cites="chollet2017xception">(<a href="#ref-chollet2017xception" role="doc-biblioref">Chollet 2017</a>)</span>. A mask detection model was created by training and fine-tuning the Xception architecture on a mask-wearing dataset. This work was completed in Helena Sheild’s Masters thesis: “Masked Faces in Context (MASON) for Masked Face Detection and Classification.” For the remainder of this paper, the fine-tuned Xception model will be referred to as “Xception”, for simplicity.</p>
+<p>This model was fine-tuned on a new dataset consisting of real-world images collected from image search sites. The goal of this model was to predict mask-wearing behavior. However, this model was not fine-tuned on the images collected from the novel trail dataset explored in this project, so it acted as a pure off-the-shelf model.</p>
+<p>The Xception mask classifier architecture works as follows:</p>
+<ol type="1">
+<li>Apply the RetinaNet face detection model to generate face crops.</li>
+<li>Feed cropped face to Xception model for mask classification.</li>
+<li>Final output is the face detected by RetinaFace along with the mask prediction.</li>
+</ol>
+<p>This architecture uses a pre-trained face detection model called RetinaNet, which was chosen due to its superior performance against other algorithms such as MT-CNN, Haar Cascade, and HOG. RetinaNet achieved higher recall and precision than the aforementioned algorithms.</p>
+<p>The Xception model is used in the mask detection portion of this architecture. Additionally, transfer learning was employed to use the existing model weights of the Xception model, and additional learning was completed iteratively to finetune against the newly gathered training set.</p>
+<p>Prior to testing on the novel trail dataset, this classifier was evaluated based on the F1 score metric and the Loss. It was demonstrated to achieve an F1-score of 0.99, and a loss of 0.0182. These metrics were evaluated on the dataset it was trained on.</p>
+</section>
+<section id="aizoo" class="level4">
+<h4 class="anchored" data-anchor-id="aizoo">AIZOO</h4>
+<p>The AIZOOtech group provides an off-the-shelf mask detection package which utilizes the structure of SSD (Single Shot MultiBox Detector). SSD is a method for detecting objects in images using a single deep neural network <span class="citation" data-cites="liu2016ssd">(<a href="#ref-liu2016ssd" role="doc-biblioref">Liu et al. 2016</a>)</span>.</p>
+<p>This architecture was chosen from several pre-trained models and was evaluated against the novel trail dataset and the previously introduced Xception model. This architecture is a pure off-the-shelf solution and was shown to have promise when confronted with unseen real-world data. The model tested is a FaceMask detection model developed by a group called AIZOOtech. This model was trained on 7971 images composed of WIDER FACE and MAFA. WIDER FACE is a face detection benchmark dataset that contains images from the publicly available WIDER dataset. This dataset contains images with a high degree of variability in scale, pose, and occlusion. Furthermore, this variability can help deter the model from overfitting during training. AIZOO provides API access to their model via PyTorch, TensorFlow, Keras, MXNet, Caffee, Paddle, and OpenCV dnn. The PyTorch framework was used for this analysis.</p>
+</section>
+<section id="metric-evaluation" class="level4">
+<h4 class="anchored" data-anchor-id="metric-evaluation">Metric Evaluation</h4>
+<p>Standard metrics were used to evaluate the models introduced above. Precision and accuracy were chosen since they are very common metrics used across the fields of computer science and machine learning. In addition, we also chose to use sensitivity and specificity. All four metrics were assessed across models and sub-groups, but the focal point was sensitivity and specificity.</p>
+</section>
+</section>
+<section id="people-tracking" class="level3">
+<h3 class="anchored" data-anchor-id="people-tracking">People Tracking</h3>
+<section id="trackformer" class="level4">
+<h4 class="anchored" data-anchor-id="trackformer">Trackformer</h4>
+<p>The task of multi-object tracking (MOT) presents a challenge that requires simultaneous reasoning about track initialization, identity, and spatiotemporal trajectories. In a paper titled “TrackFormer: Multi-Object Tracking with Transformers”, the authors introduce an end-to-end trainable MOT approach called TrackFormer. TrackFormer is based on an encoder-decoder Transformer architecture and was shown to achieve state-of-the-art performance on MOT17 and MOTS20 without relying on any additional graph optimization, or modeling of motion and/or appearance <span class="citation" data-cites="meinhardt2022trackformer">(<a href="#ref-meinhardt2022trackformer" role="doc-biblioref">Meinhardt et al. 2022</a>)</span>.</p>
+<p>The network uses a CNN (ResNet-50) to identify features in the frame that get passed through the Transformer Encoder and Decoder to identify objects to track. When objects are identified, track queries are initiated that get passed onto the next frame in the sequence. The track queries from previous frames are passed to the Transformer Decoder to inform target recognition and maintain a memory of the objects in the scene to track them over time.</p>
+<p>The primary data set used to train and evaluate the original model was MOT17 along with further investigation using MOT20 and MOTS20. The data includes video clips of multiple humans moving throughout the frame in different environments with varying levels of complexity and crowdedness.</p>
+</section>
+</section>
+</section>
+</section>
+<section id="sec-results" class="level1">
+<h1>Results</h1>
+<p>This section covers the results of the different models. The mask detection models were applied to the labeled frames and the predicted results were compared to the labels.</p>
+<section id="face-detection-1" class="level2">
+<h2 class="anchored" data-anchor-id="face-detection-1">Face Detection</h2>
+<section id="sec-deepface-results" class="level3">
+<h3 class="anchored" data-anchor-id="sec-deepface-results">DeepFace</h3>
+<p>The Xception architecture typically only picks up one face in each frame. However, the DeepFace model, using the retinaface backend, successfully finds multiple faces. An example of this can be seen in <a href="#fig-deepface">Figure&nbsp;7</a>.</p>
+</section>
+<section id="sec-retinaface-results" class="level3">
+<h3 class="anchored" data-anchor-id="sec-retinaface-results">RetinaFace</h3>
+<p>The retinaface backend proved successful when testing the DeepFace framework. Retinaface also provides the capability to extract facial landmarks, such as the eyes, nose, and mouth corners. One hypothesis was to use the facial landmarks, or lack-there-of, to infer whether or not a mask is being worn. However, as can be seen in <a href="#fig-retina-mask2">Figure&nbsp;8 (c)</a>, the RetinaFace algorithm attempts to find facial landmark points regardless of mask-wearing behavior.</p>
+<p>Moreover, successful facial landmark detection opens up additional avenues of analysis such as head pose, gaze direction, and facial expression estimation.</p>
+</section>
+</section>
+<section id="mask-detection-1" class="level2">
+<h2 class="anchored" data-anchor-id="mask-detection-1">Mask Detection</h2>
+<section id="xception-1" class="level3">
+<h3 class="anchored" data-anchor-id="xception-1">Xception</h3>
+<p>The Xception model was evaluated against standard metrics. The results can be seen in <a href="#tbl-metrics-full-dataset">Table&nbsp;1</a> and plots can be found in <a href="#fig-all-groups">Figure&nbsp;1 (a)</a>.</p>
+<div id="fig-metrics_full_dataset" class="quarto-layout-panel">
+<figure class="figure">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-metrics-full-dataset" class="quarto-layout-cell anchored" style="flex-basis: 50.0%;justify-content: center;">
+<table class="table">
+<caption>Table&nbsp;1: Metrics - full dataset</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Metric</th>
+<th style="text-align: center;">Score</th>
+<th style="text-align: center;">Lower</th>
+<th style="text-align: center;">Upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Sensitivity</td>
+<td style="text-align: center;">0.799</td>
+<td style="text-align: center;">0.761</td>
+<td style="text-align: center;">0.840</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Specificity</td>
+<td style="text-align: center;">0.430</td>
+<td style="text-align: center;">0.392</td>
+<td style="text-align: center;">0.468</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Precision</td>
+<td style="text-align: center;">0.542</td>
+<td style="text-align: center;">0.509</td>
+<td style="text-align: center;">0.586</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Accuracy</td>
+<td style="text-align: center;">0.599</td>
+<td style="text-align: center;">0.565</td>
+<td style="text-align: center;">0.623</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-all-groups" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/metrics/all_groups_metrics.png" class="img-fluid figure-img" data-ref-parent="fig-metrics_full_dataset"></p>
+<p></p><figcaption class="figure-caption">(a) Metrics with Confidence Intervals</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: Xception Model Metrics</figcaption><p></p>
+</figure>
+</div>
+<p>The lower bound and upper bounds of the metrics were calculated by bootstrapping a 95% confidence interval. Bootstrap methods, in general, consist of estimating a characteristic of the unknown population by simulating the characteristic when the true population is replaced by an estimated one <span class="citation" data-cites="diciccio1988review">(see <a href="#ref-diciccio1988review" role="doc-biblioref">Diciccio and Romano 1988</a>)</span>. The 95th percentile method was used to calculate a set of approximate confidence limits for the metrics defined above.</p>
+<p>The metric results for the full dataset provided some insights into the limitations of the trained model. A noteworthy limitation is a specificity equal to 0.4 and a sensitivity equal to 0.8. The relatively high sensitivity paired with a low specificity shows that this model overpredicts mask-wearing. Additional sub-groups were analyzed to see if the model performed better in different scenarios.</p>
+<section id="sub-group-metric-evaluations" class="level4">
+<h4 class="anchored" data-anchor-id="sub-group-metric-evaluations">Sub-group Metric Evaluations</h4>
+<p>See <a href="#fig-quadrants">Figure&nbsp;9</a> for metrics calculated across frame quadrants. The first and third quadrants represent the upper-left and upper-right quadrants of each frame, respectively. Quadrants 2 and 4 represent the bottom two quadrants of each frame, and in most cases are images of the ground. In this analysis, all faces were found in quadrants 1 and 3. Both quadrant 1 and quadrant 3 have poor specificity, with quadrant 3 having very poor specificity compared to the entire dataset. Both of these quadrants have high sensitivity also, which indicates overprediction independent of the quadrant.</p>
+<p>Metrics were also calculated across a combination of quadrants and dates. The hypothesis was that since both the quadrants and dates yielded similar results, the combination will yield overprediction as well. Each sub-group was shown to have high sensitivity and low specificity, which aligned with the overprediction hypothesis.</p>
+</section>
+<section id="image-examples" class="level4">
+<h4 class="anchored" data-anchor-id="image-examples">Image Examples</h4>
+<p>Quadrant 1 image examples can be seen in <a href="#fig-q1">Figure&nbsp;10</a>, and quadrant 3 image examples can be seen in <a href="#fig-q3">Figure&nbsp;11</a>.</p>
+</section>
+</section>
+<section id="aizoo-1" class="level3">
+<h3 class="anchored" data-anchor-id="aizoo-1">AIZOO</h3>
+<p>The AIZOO model was ran on the trail dataset and metrics were calculated. This model was ran through the PyTorch interface, and was able to achieve a precision of 0.96. See <a href="#fig-aizoo-metrics">Figure&nbsp;2</a> for full results.</p>
+<div id="fig-aizoo-metrics" class="quarto-layout-panel">
+<figure class="figure">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="tbl-aizoo-metrics" class="quarto-layout-cell anchored" style="flex-basis: 50.0%;justify-content: center;">
+<table class="table">
+<caption>Table&nbsp;2: Metrics - AIZOO</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Metric</th>
+<th style="text-align: center;">Score</th>
+<th style="text-align: center;">Lower</th>
+<th style="text-align: center;">Upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Sensitivity</td>
+<td style="text-align: center;">0.520</td>
+<td style="text-align: center;">0.478</td>
+<td style="text-align: center;">0.574</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Specificity</td>
+<td style="text-align: center;">0.980</td>
+<td style="text-align: center;">0.964</td>
+<td style="text-align: center;">0.993</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Precision</td>
+<td style="text-align: center;">0.968</td>
+<td style="text-align: center;">0.933</td>
+<td style="text-align: center;">0.986</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Accuracy</td>
+<td style="text-align: center;">0.739</td>
+<td style="text-align: center;">0.712</td>
+<td style="text-align: center;">0.770</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
+<div id="fig-aizoo-metrics" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/aizoo/aizoo_metrics.png" class="img-fluid figure-img" data-ref-parent="fig-aizoo-metrics"></p>
+<p></p><figcaption class="figure-caption">(a) AIZOO Inference</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: AIZOO Metrics</figcaption><p></p>
+</figure>
+</div>
+<p>The AIZOO model was able to achieve a specificity of 0.98. This means that the model is very unlikely to generate false positives, meaning that mask predictions are more reliable and can be trusted.</p>
+</section>
+<section id="xception-vs-aizoo" class="level3">
+<h3 class="anchored" data-anchor-id="xception-vs-aizoo">Xception vs AIZOO</h3>
+<p>The performance of the Xception model and the AIZOO model were compared. See <a href="#fig-aizoo-xception">Figure&nbsp;3</a> for full results.</p>
+<div id="fig-aizoo-xception" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="final_report_images/aizoo/aizoo_vs_xception.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3: Xception vs AIZOO</figcaption><p></p>
+</figure>
+</div>
+<p>AIZOO had lower sensitivity but higher specificity, leading to substantially higher precision. This was consistent across all datasets and showed that the AIZOO model provides more reliable mask predictions than the Xception model. The accuracy for the AIZOO model is 0.73, which isn’t optimal. However, the high precision score is a great starting ground for further fine-tuning the model.</p>
+</section>
+</section>
+<section id="people-tracking-1" class="level2">
+<h2 class="anchored" data-anchor-id="people-tracking-1">People Tracking</h2>
+<section id="sec-trackformer-results" class="level3">
+<h3 class="anchored" data-anchor-id="sec-trackformer-results">Trackformer</h3>
+<p>TrackFormer was able to successfully track people across multiple frames by utlizing an encoder-decoder transformer architecture. See <a href="#fig-trackformer">Figure&nbsp;13</a> for an example of the model tracking people, and a dog, throughout frames.</p>
+</section>
+</section>
+</section>
+<section id="sec-limitations" class="level1">
+<h1>Limitations</h1>
+<section id="unrepresentative-dataset-for-mask-wearing" class="level2">
+<h2 class="anchored" data-anchor-id="unrepresentative-dataset-for-mask-wearing">Unrepresentative Dataset for Mask Wearing</h2>
+<p>The lack of mask-wearing footage led to an unrepresentative dataset for mask-wearing. MPRB permits were received after mask mandates were lifted, requiring the team to heavily rely on UMN actors for mask-wearing footage. After mask mandates were lifted in Minnesota it was uncommon to see someone wearing a mask outdoors. This led the research team to plant mask-wearers on the trails to capture footage. Analyzing the footage made it clear that the actors did not imitate a traditional trail goer; instead of traversing the trail linearly: out of the frame from afar, towards the camera, and out of the frame again, the actors paced around and sat in front of the camera. Furthermore, the number of mask-wearing actors was very small, leading to a disproportionate amount of frames containing actors. This led to an unrepresentative dataset for mask-wearing, which made it difficult to assess how well the mask detectors would perform on this type of dataset.</p>
+</section>
+<section id="difficult-to-employ-transfer-learning" class="level2">
+<h2 class="anchored" data-anchor-id="difficult-to-employ-transfer-learning">Difficult to Employ Transfer Learning</h2>
+<p>The limited number of labeled images made it difficult to employ transfer learning. Transfer learning involves taking a model with pre-trained weights, and applying additional rounds of training with a new dataset. This is commonly referred to as “fine-tuning”, and can help with the performance of a model. Out of 31 hours of footage, 977 frames (about 3 minutes) were labeled. Furthermore, out of these 977 frames, 447 had a positive mask label. The majority of these frames contained one mask-wearing actor, and fine-tuning could have led to an overfit model.</p>
+</section>
+<section id="high-proportion-of-low-confidence-mask-predictions" class="level2">
+<h2 class="anchored" data-anchor-id="high-proportion-of-low-confidence-mask-predictions">High Proportion of Low-Confidence Mask Predictions</h2>
+<p>The high proportion of small faces, relative to the frame, led to a high proportion of faces not yielding adequate confidence to enable a mask prediction. The camera’s positioning was angled in a way that captured more footage of people further away from the camera than close to it. Analyzing the prediction results, it was determined that faces closer to the camera (relatively bigger, higher resolution) yielded higher confidence predictions. One way to address this limitation is to find a camera position that captures more up-close footage. Another way to expand this study, which doesn’t require redesigning the experiment, is to include tracking, which could potentially improve the accuracy of predictions. Tracking people throughout frames would allow the higher confidence predictions to play a bigger role in determining the mask-wearing status of each person.</p>
+</section>
+</section>
+<section id="sec-conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Off-the-shelf deep learning models were successfully used for face detection, mask detection, and people tracking on a novel trail dataset. These models included RetinaFace for face detection, Xception and AIZOO-based models for mask detection, and Trackformer for people tracking. Limitations such as a lack of labeled images and substandard camera positioning were highlighted, and ways to mitigate these limitations were discussed.</p>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-chollet2017xception" class="csl-entry" role="listitem">
+Chollet, François. 2017. <span>“Xception: Deep Learning with Depthwise Separable Convolutions.”</span> In <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition</em>, 1251–58.
+</div>
+<div id="ref-diciccio1988review" class="csl-entry" role="listitem">
+Diciccio, Thomas J, and Joseph P Romano. 1988. <span>“A Review of Bootstrap Confidence Intervals.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 50 (3): 338–54.
+</div>
+<div id="ref-liu2016ssd" class="csl-entry" role="listitem">
+Liu, Wei, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Scott Reed, Cheng-Yang Fu, and Alexander C Berg. 2016. <span>“Ssd: Single Shot Multibox Detector.”</span> In <em>Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, the Netherlands, October 11–14, 2016, Proceedings, Part i 14</em>, 21–37. Springer.
+</div>
+<div id="ref-mascarenhas2021comparison" class="csl-entry" role="listitem">
+Mascarenhas, Sheldon, and Mukul Agarwal. 2021. <span>“A Comparison Between VGG16, VGG19 and ResNet50 Architecture Frameworks for Image Classification.”</span> In <em>2021 International Conference on Disruptive Technologies for Multi-Disciplinary Research and Applications (CENTCON)</em>, 1:96–99. IEEE.
+</div>
+<div id="ref-meinhardt2022trackformer" class="csl-entry" role="listitem">
+Meinhardt, Tim, Alexander Kirillov, Laura Leal-Taixe, and Christoph Feichtenhofer. 2022. <span>“Trackformer: Multi-Object Tracking with Transformers.”</span> In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 8844–54.
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="appendix" class="level1 appendix"><h2 class="anchored quarto-appendix-heading">Appendix</h2><div class="quarto-appendix-contents">
+
 <div id="fig-lakes" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -150,7 +414,7 @@ div.csl-indent {
 <p>&nbsp;</p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;1: Data Collection Locations</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: Data Collection Locations</figcaption><p></p>
 </figure>
 </div>
 <div id="fig-trails" class="quarto-layout-panel">
@@ -193,7 +457,7 @@ div.csl-indent {
 <p>&nbsp;</p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;2: Data Collection Locations Examples</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;5: Data Collection Locations Examples</figcaption><p></p>
 </figure>
 </div>
 <div id="fig-cameras" class="quarto-layout-panel">
@@ -236,71 +500,9 @@ div.csl-indent {
 <p>&nbsp;</p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;3: Data Collection Camera Positions</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;6: Data Collection Camera Positions</figcaption><p></p>
 </figure>
 </div>
-<p>In order to assess the performance of a mask classifier, a subset of footage needs to be labeled. Having access to the ground-truth values allows classifier metrics to be calculated as well as opening up the possibility of fine-tuning. Manual labeling was employed to achieve ground-truth labeling, and faces in 977 frames were labeled with their corresponding mask-wearing status. Of these 977 frames, 530 held the label “No Mask”, and 447 “Mask.”</p>
-</section>
-<section id="machine-learning" class="level2">
-<h2 class="anchored" data-anchor-id="machine-learning">Machine Learning</h2>
-<section id="face-detection" class="level3">
-<h3 class="anchored" data-anchor-id="face-detection">Face Detection</h3>
-<p>Determining whether a person is wearing a face mask is dependent on being able to identify their face. Two mask detectors are evaluated in this work, and both utilize face detectors that are similar to a model called RetinaFace. The sections below brielfy introduces facial detection frameworks explored in this project.</p>
-<section id="deepface" class="level4">
-<h4 class="anchored" data-anchor-id="deepface">DeepFace</h4>
-<p>DeepFace is an off-the-shelf facial recognition framework for python. This library includes access to state-of-the-art models such as VGG-Face, Google FaceNet, OpenFace, Facebook DeepFace, DeepID, ArcFace, Dlib, and SFace.</p>
-</section>
-<section id="retinaface" class="level4">
-<h4 class="anchored" data-anchor-id="retinaface">RetinaFace</h4>
-<p>RetinaFace is an off-the-shelf face detection package that utilizes a Resnet50 backbone. Resnet50 is a convolutional neural network-based model that consists of 48 convolution layers <span class="citation" data-cites="mascarenhas2021comparison">(<a href="#ref-mascarenhas2021comparison" role="doc-biblioref">Mascarenhas and Agarwal 2021</a>)</span>. Furthermore, the ResNet architecture allowed deep neural networks to mitigate greater training error percentages by introducing the addition of shortcut connections and residual functions <span class="citation" data-cites="mascarenhas2021comparison">(<a href="#ref-mascarenhas2021comparison" role="doc-biblioref">Mascarenhas and Agarwal 2021</a>)</span>.</p>
-</section>
-</section>
-<section id="mask-detection" class="level3">
-<h3 class="anchored" data-anchor-id="mask-detection">Mask Detection</h3>
-<section id="xception" class="level4">
-<h4 class="anchored" data-anchor-id="xception">Xception</h4>
-<p>Xception is convolutional neural network architecture based entirely on depthwise separable convolution layers <span class="citation" data-cites="chollet2017xception">(<a href="#ref-chollet2017xception" role="doc-biblioref">Chollet 2017</a>)</span>. A mask detection model was created by training and fine-tuning the Xception architecture on a mask-wearing dataset. In this paper, the fine-tuned Xception model will be referred to as “Xception”, for simplicity.</p>
-<p>This model was fine-tuned on a new dataset consisting of real-world images collected from image search sites. The goal of this model was to predict mask-wearing behavior. However, this model was not fine-tuned on the images collected from the novel trail dataset explored in this project, so it acted as a pure off-the-shelf model.</p>
-<p>The Xception mask classifier architecture works as follows:</p>
-<ol type="1">
-<li>Apply the RetinaNet face detection model to generate face crops.</li>
-<li>Feed cropped face to Xception model for mask classification.</li>
-<li>Final output is the face detected by RetinaFace along with the mask prediction.</li>
-</ol>
-<p>This architecture uses a pre-trained face detection model called RetinaNet, which was chosen due to its superior performance against other algorithms such as MT-CNN, Haar Cascade, and HOG. RetinaNet achieved higher recall and precision than the aforementioned algorithms.</p>
-<p>The Xception model is used in the mask detection portion of this architecture. Additionally, transfer learning was employed to use the existing model weights of the Xception model, and additional learning was completed iteratively to finetune against the newly gathered training set.</p>
-<p>Prior to testing on the novel trail dataset, this classifier was evaluated based on the F1 score metric and the Loss. It was demonstrated to achieve an F1-score of 0.99, and a loss of 0.0182. These metrics were evaluated on the dataset it was trained on.</p>
-</section>
-<section id="aizoo" class="level4">
-<h4 class="anchored" data-anchor-id="aizoo">AIZOO</h4>
-<p>The AIZOOtech group provides an off-the-shelf mask detection package which utilizes the structure of SSD (Single Shot MultiBox Detector). SSD is a method for detecting objects in images using a single deep neural network <span class="citation" data-cites="liu2016ssd">(<a href="#ref-liu2016ssd" role="doc-biblioref">Liu et al. 2016</a>)</span>.</p>
-<p>This architecture was chosen from several pre-trained models and was evaluated against the novel trail dataset and the previously introduced Xception model. This architecture is a pure off-the-shelf solution and was shown to have promise when confronted with unseen real-world data. The model tested is a FaceMask detection model developed by a group called AIZOOtech. This model was trained on 7971 images composed of WIDER FACE and MAFA. WIDER FACE is a face detection benchmark dataset that contains images from the publicly available WIDER dataset. This dataset contains images with a high degree of variability in scale, pose, and occlusion. Furthermore, this variability can help deter the model from overfitting during training. AIZOO provides API access to their model via PyTorch, TensorFlow, Keras, MXNet, Caffee, Paddle, and OpenCV dnn. The PyTorch framework was used for this analysis.</p>
-</section>
-<section id="metric-evaluation" class="level4">
-<h4 class="anchored" data-anchor-id="metric-evaluation">Metric Evaluation</h4>
-<p>Standard metrics were used to evaluate the models introduced above. The metrics chosen were sensitivity, specificity, precision, and accuracy. Sensitivity and specificity are not commonly found when it comes to evaluating deep learning models but are common in the field of biostatistics, which is relevant to this project. Precision and accuracy were chosen since they are very common metrics used across the fields of computer science and machine learning. All four metrics were assessed across models and sub-groups, but the focal point was sensitivity and specificity.</p>
-<p>Sensitivity is defined as the probability of having a true positive given that you tested positive: <span class="math inline">\(P(T=1 | D=1)\)</span>, where T is the true result, and D is the test result.</p>
-<p>Specificity is defined as the probability of having a true negative given that you tested negative: <span class="math inline">\(P(T=0 | D=0)\)</span>, where T is the true result, and D is the test result.</p>
-</section>
-</section>
-<section id="people-tracking" class="level3">
-<h3 class="anchored" data-anchor-id="people-tracking">People Tracking</h3>
-<section id="trackformer" class="level4">
-<h4 class="anchored" data-anchor-id="trackformer">Trackformer</h4>
-<p>The task of multi-object tracking (MOT) presents a challenge that requires simultaneous reasoning about track initialization, identity, and spatiotemporal trajectories. In a paper titled “TrackFormer: Multi-Object Tracking with Transformers”, the authors introduce an end-to-end trainable MOT approach called TrackFormer. TrackFormer is based on an encoder-decoder Transformer architecture and was shown to achieve state-of-the-art performance on MOT17 and MOTS20 without relying on any additional graph optimization, or modeling of motion and/or appearance <span class="citation" data-cites="meinhardt2022trackformer">(<a href="#ref-meinhardt2022trackformer" role="doc-biblioref">Meinhardt et al. 2022</a>)</span>.</p>
-<p>The network uses a CNN (ResNet-50) to identify features in the frame that get passed through the Transformer Encoder and Decoder to identify objects to track. When objects are identified, track queries are initiated that get passed onto the next frame in the sequence. The track queries from previous frames are passed to the Transformer Decoder to inform target recognition and maintain a memory of the objects in the scene to track them over time.</p>
-<p>The primary data set used to train and evaluate the original model was MOT17 along with further investigation using MOT20 and MOTS20. The data includes video clips of multiple humans moving throughout the frame in different environments with varying levels of complexity and crowdedness.</p>
-</section>
-</section>
-</section>
-</section>
-<section id="sec-results" class="level1">
-<h1>Results</h1>
-<section id="face-detection-1" class="level2">
-<h2 class="anchored" data-anchor-id="face-detection-1">Face Detection</h2>
-<section id="sec-deepface-results" class="level3">
-<h3 class="anchored" data-anchor-id="sec-deepface-results">DeepFace</h3>
-<p>The results of the face detectors are shown in <a href="#fig-deepface">Figure&nbsp;4</a>. The Xception architecture was able to find and draw a bounding box on one of two visible faces in the image. However, the DeepFace model, using the retinaface backend, successfully found both visible faces.</p>
 <div id="fig-deepface" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -335,14 +537,9 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;4: Facial Detection</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;7: Facial Detection</figcaption><p></p>
 </figure>
 </div>
-</section>
-<section id="sec-retinaface-results" class="level3">
-<h3 class="anchored" data-anchor-id="sec-retinaface-results">RetinaFace</h3>
-<p>The retinaface backend proved successful when testing the DeepFace framework. Retinaface also provides the capability to extract facial landmarks, such as the eyes, nose, and mouth corners. One hypothesis was to use the facial landmarks, or lack-there-of, to infer whether or not a mask is being worn. However, as can be seen in <a href="#fig-retina-mask2">Figure&nbsp;5 (c)</a>, the RetinaFace algorithm attempts to find facial landmark points regardless of mask-wearing behavior.</p>
-<p>Moreover, successful facial landmark detection opens up additional avenues of analysis such as head pose, gaze direction, and facial expression estimation.</p>
 <div id="fig-retinaface" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -385,100 +582,15 @@ div.csl-indent {
 <p>&nbsp;</p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;5: Facial Landmark Detection</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;8: Facial Landmark Detection</figcaption><p></p>
 </figure>
 </div>
-</section>
-</section>
-<section id="mask-detection-1" class="level2">
-<h2 class="anchored" data-anchor-id="mask-detection-1">Mask Detection</h2>
-<section id="xception-1" class="level3">
-<h3 class="anchored" data-anchor-id="xception-1">Xception</h3>
-<p>The Xception model was evaluated against standard metrics. The results can be seen in <a href="#tbl-metrics-full-dataset">Table&nbsp;1</a> and plots can be found in <a href="#fig-all-groups">Figure&nbsp;6 (a)</a>.</p>
-<div id="fig-metrics_full_dataset" class="quarto-layout-panel">
-<figure class="figure">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 25.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-<div id="tbl-metrics-full-dataset" class="quarto-layout-cell anchored" style="flex-basis: 50.0%;justify-content: center;">
-<table class="table">
-<caption>Table&nbsp;1: Metrics - full dataset</caption>
-<thead>
-<tr class="header">
-<th style="text-align: center;">Metric</th>
-<th style="text-align: center;">Score</th>
-<th style="text-align: center;">Lower bound</th>
-<th style="text-align: center;">Upper bound</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">Sensitivity</td>
-<td style="text-align: center;">0.7987</td>
-<td style="text-align: center;">0.7614</td>
-<td style="text-align: center;">0.8403</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">Specificity</td>
-<td style="text-align: center;">0.4302</td>
-<td style="text-align: center;">0.3916</td>
-<td style="text-align: center;">0.4675</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">Precision</td>
-<td style="text-align: center;">0.5417</td>
-<td style="text-align: center;">0.5094</td>
-<td style="text-align: center;">0.5856</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">Accuracy</td>
-<td style="text-align: center;">0.5988</td>
-<td style="text-align: center;">0.5654</td>
-<td style="text-align: center;">0.6233</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 25.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 25.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
-<div id="fig-all-groups" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="final_report_images/metrics/all_groups_metrics.png" class="img-fluid figure-img" data-ref-parent="fig-metrics_full_dataset"></p>
-<p></p><figcaption class="figure-caption">(a) Metrics with Confidence Intervals</figcaption><p></p>
-</figure>
-</div>
-</div>
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 25.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-</div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;6: Xception Model Metrics</figcaption><p></p>
-</figure>
-</div>
-<p>The lower bound and upper bounds of the metrics were calculated by bootstrapping a 95% confidence interval. Bootstrap methods, in general, consist of estimating a characteristic of the unknown population by simulating the characteristic when the true population is replaced by an estimated one <span class="citation" data-cites="diciccio1988review">(see <a href="#ref-diciccio1988review" role="doc-biblioref">Diciccio and Romano 1988</a>)</span>. The 95th percentile method was used to calculate a set of approximate confidence limits for the metrics defined above.</p>
-<p>The metric results for the full dataset provided some insights into the limitations of the trained model. A noteworthy limitation is a specificity equal to 0.4 and a sensitivity equal to 0.8. The relatively high sensitivity paired with a low specificity shows that this model overpredicts mask-wearing. Additional sub-groups were analyzed to see if the model performed better in different scenarios.</p>
-<section id="sub-group-metric-evaluations" class="level4">
-<h4 class="anchored" data-anchor-id="sub-group-metric-evaluations">Sub-group Metric Evaluations</h4>
-<p>See <a href="#fig-quadrants">Figure&nbsp;7</a> for metrics calculated across frame quadrants. The first and third quadrants represent the upper-left and upper-right quadrants of each frame, respectively. Quadrants 2 and 4 represent the bottom two quadrants of each frame, and in most cases are images of the ground. In this analysis, all faces were found in quadrants 1 and 3. Both quadrant 1 and quadrant 3 have poor specificity, with quadrant 3 having very poor specificity compared to the entire dataset. Both of these quadrants have high sensitivity also, which indicates overprediction independent of the quadrant.</p>
 <div id="fig-quadrants" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="final_report_images/metrics/quadrants_metrics.png" class="img-fluid figure-img" style="width:50.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;7: Metrics Across Quadrants</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;9: Metrics Across Quadrants</figcaption><p></p>
 </figure>
 </div>
-<p>Metrics were also calculated across a combination of quadrants and dates. The hypothesis was that since both the quadrants and dates yielded similar results, the combination will yield overprediction as well. Each sub-group was shown to have high sensitivity and low specificity, which aligned with the overprediction hypothesis.</p>
-</section>
-<section id="image-examples" class="level4">
-<h4 class="anchored" data-anchor-id="image-examples">Image Examples</h4>
-<p>Quadrant 1 image examples can be seen in <a href="#fig-q1">Figure&nbsp;8</a>, and quadrant 3 image examples can be seen in <a href="#fig-q3">Figure&nbsp;9</a>.</p>
 <div id="fig-q1" class="quarto-layout-panel">
 <figure class="figure">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -495,7 +607,7 @@ div.csl-indent {
 <p>&nbsp;</p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;8: Quadrant 1 Examples</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;10: Quadrant 1 Examples</figcaption><p></p>
 </figure>
 </div>
 <div id="fig-q3" class="quarto-layout-panel">
@@ -514,150 +626,20 @@ div.csl-indent {
 <p>&nbsp;</p>
 </div>
 </div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;9: Quadrant 3 Examples</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;11: Quadrant 3 Examples</figcaption><p></p>
 </figure>
 </div>
-</section>
-</section>
-<section id="aizoo-1" class="level3">
-<h3 class="anchored" data-anchor-id="aizoo-1">AIZOO</h3>
-<p>The AIZOO model was ran on the trail dataset and metrics were calculated. This model was ran through the PyTorch interface, and was able to achieve a precision of 0.98.</p>
-<div id="fig-aizoo-metrics" class="quarto-layout-panel">
-<figure class="figure">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div id="tbl-aizoo-metrics" class="quarto-layout-cell anchored" style="flex-basis: 40.0%;justify-content: center;">
-<table class="table">
-<caption>Table&nbsp;2: Metrics - AIZOO</caption>
-<thead>
-<tr class="header">
-<th style="text-align: center;">Metric</th>
-<th style="text-align: center;">Score</th>
-<th style="text-align: center;">Lower bound</th>
-<th style="text-align: center;">Upper bound</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">Sensitivity</td>
-<td style="text-align: center;">0.5199</td>
-<td style="text-align: center;">0.4778</td>
-<td style="text-align: center;">0.5740</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">Specificity</td>
-<td style="text-align: center;">0.9804</td>
-<td style="text-align: center;">0.9642</td>
-<td style="text-align: center;">0.9932</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">Precision</td>
-<td style="text-align: center;">0.9676</td>
-<td style="text-align: center;">0.9326</td>
-<td style="text-align: center;">0.9864</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">Accuracy</td>
-<td style="text-align: center;">0.7386</td>
-<td style="text-align: center;">0.7118</td>
-<td style="text-align: center;">0.7698</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 10.0%;justify-content: center;">
-<p>&nbsp;</p>
-</div>
-<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
-<div id="fig-aizoo-metrics" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="final_report_images/aizoo/aizoo_metrics.png" class="img-fluid figure-img" data-ref-parent="fig-aizoo-metrics"></p>
-<p></p><figcaption class="figure-caption">(a) AIZOO Inference</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;10: AIZOO Metrics</figcaption><p></p>
-</figure>
-</div>
-</section>
-<section id="xception-vs-aizoo" class="level3">
-<h3 class="anchored" data-anchor-id="xception-vs-aizoo">Xception vs AIZOO</h3>
-<p>AIZOO had lower sensitivity but higher specificity, leading to substantially higher precision. This was consistent across all datasets.</p>
-<div id="fig-xception-aizoo" class="quarto-layout-panel">
-<figure class="figure">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
-<div id="fig-aizoo-xception" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="final_report_images/aizoo/aizoo_vs_xception.png" class="img-fluid figure-img" data-ref-parent="fig-xception-aizoo"></p>
-<p></p><figcaption class="figure-caption">(a) Xception vs AIZOO</figcaption><p></p>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell quarto-layout-cell-subref" style="flex-basis: 50.0%;justify-content: center;">
 <div id="fig-aizoo-example" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="final_report_images/aizoo/aizoo.png" class="img-fluid figure-img" data-ref-parent="fig-xception-aizoo"></p>
-<p></p><figcaption class="figure-caption">(b) AIZOO Inference Example</figcaption><p></p>
+<p><img src="final_report_images/aizoo/aizoo.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;12: AIZOO Inference Example</figcaption><p></p>
 </figure>
 </div>
-</div>
-</div>
-<p></p><figcaption class="figure-caption">Figure&nbsp;11: Xception vs AIZOO Metrics and AIZOO Example</figcaption><p></p>
-</figure>
-</div>
-</section>
-</section>
-<section id="people-tracking-1" class="level2">
-<h2 class="anchored" data-anchor-id="people-tracking-1">People Tracking</h2>
-<section id="sec-trackformer-results" class="level3">
-<h3 class="anchored" data-anchor-id="sec-trackformer-results">Trackformer</h3>
-<p>TrackFormer was able to successfully track people across multiple frames by utlizing an encoder-decoder transformer architecture. See <a href="#fig-trackformer">Figure&nbsp;12</a> for an example of the model tracking people, and a dog, throughout frames.</p>
 <div id="fig-trackformer" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="final_report_images/trackformer/trackformer.png" class="img-fluid figure-img" style="width:50.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;12: Trackformer Example</figcaption><p></p>
+<p><img src="final_report_images/trackformer/trackformer.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;13: Trackformer Example</figcaption><p></p>
 </figure>
-</div>
-</section>
-</section>
-</section>
-<section id="sec-limitations" class="level1">
-<h1>Limitations</h1>
-<section id="unrepresentative-dataset-for-mask-wearing" class="level2">
-<h2 class="anchored" data-anchor-id="unrepresentative-dataset-for-mask-wearing">Unrepresentative Dataset for Mask Wearing</h2>
-<p>The lack of mask-wearing footage led to an unrepresentative dataset for mask-wearing. MPRB permits were received after mask mandates were lifted, requiring the team to heavily rely on UMN actors for mask-wearing footage. After mask mandates were lifted in Minnesota it was uncommon to see someone wearing a mask outdoors. This led the research team to plant mask-wearers on the trails to capture footage. Analyzing the footage made it clear that the actors did not imitate a traditional trail goer; instead of traversing the trail linearly: out of the frame from afar, towards the camera, and out of the frame again, the actors paced around and sat in front of the camera. Furthermore, the number of mask-wearing actors was very small, leading to a disproportionate amount of frames containing actors. This led to an unrepresentative dataset for mask-wearing, which made it difficult to assess how well the mask detectors would perform on this type of dataset.</p>
-</section>
-<section id="difficult-to-employ-transfer-learning" class="level2">
-<h2 class="anchored" data-anchor-id="difficult-to-employ-transfer-learning">Difficult to Employ Transfer Learning</h2>
-<p>The limited number of labeled images made it difficult to employ transfer learning. Transfer learning involves taking a model with pre-trained weights, and applying additional rounds of training with a new dataset. This is commonly referred to as “fine-tuning”, and can help with the performance of a model. Out of 31 hours of footage, 977 frames (about 3 minutes) were labeled. Furthermore, out of these 977 frames, 447 had a positive mask label. The majority of these frames contained one mask-wearing actor, and fine-tuning could have led to an overfit model.</p>
-</section>
-<section id="high-proportion-of-low-confidence-mask-predictions" class="level2">
-<h2 class="anchored" data-anchor-id="high-proportion-of-low-confidence-mask-predictions">High Proportion of Low-Confidence Mask Predictions</h2>
-<p>The high proportion of small faces, relative to the frame, led to a high proportion of faces not yielding adequate confidence to enable a mask prediction. The camera’s positioning was angled in a way that captured more footage of people further away from the camera than close to it. Analyzing the prediction results, it was determined that faces closer to the camera (relatively bigger, higher resolution) yielded higher confidence predictions. One way to address this limitation is to find a camera position that captures more up-close footage. Another way to expand this study, which doesn’t require redesigning the experiment, is to include tracking, which could potentially improve the accuracy of predictions. Tracking people throughout frames would allow the higher confidence predictions to play a bigger role in determining the mask-wearing status of each person.</p>
-</section>
-</section>
-<section id="sec-conclusion" class="level1">
-<h1>Conclusion</h1>
-<p>Off-the-shelf deep learning models were successfully used for face detection, mask detection, and people tracking on a novel trail dataset. These models included RetinaFace for face detection, Xception and AIZOO-based models for mask detection, and Trackformer for people tracking. Limitations such as a lack of labeled images and substandard camera positioning were highlighted, and ways to mitigate these limitations were discussed.</p>
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-chollet2017xception" class="csl-entry" role="listitem">
-Chollet, François. 2017. <span>“Xception: Deep Learning with Depthwise Separable Convolutions.”</span> In <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition</em>, 1251–58.
-</div>
-<div id="ref-diciccio1988review" class="csl-entry" role="listitem">
-Diciccio, Thomas J, and Joseph P Romano. 1988. <span>“A Review of Bootstrap Confidence Intervals.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 50 (3): 338–54.
-</div>
-<div id="ref-liu2016ssd" class="csl-entry" role="listitem">
-Liu, Wei, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Scott Reed, Cheng-Yang Fu, and Alexander C Berg. 2016. <span>“Ssd: Single Shot Multibox Detector.”</span> In <em>Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, the Netherlands, October 11–14, 2016, Proceedings, Part i 14</em>, 21–37. Springer.
-</div>
-<div id="ref-mascarenhas2021comparison" class="csl-entry" role="listitem">
-Mascarenhas, Sheldon, and Mukul Agarwal. 2021. <span>“A Comparison Between VGG16, VGG19 and ResNet50 Architecture Frameworks for Image Classification.”</span> In <em>2021 International Conference on Disruptive Technologies for Multi-Disciplinary Research and Applications (CENTCON)</em>, 1:96–99. IEEE.
-</div>
-<div id="ref-meinhardt2022trackformer" class="csl-entry" role="listitem">
-Meinhardt, Tim, Alexander Kirillov, Laura Leal-Taixe, and Christoph Feichtenhofer. 2022. <span>“Trackformer: Multi-Object Tracking with Transformers.”</span> In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 8844–54.
 </div>
 </div></section></div></main>
 <!-- /main column -->
